@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Video Player</title>
+  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f9;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    #my-video {
+      max-width: 100%;
+      border: 5px solid #444;
+      border-radius: 10px;
+      background-color: #000;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    #video-url {
+      padding: 10px;
+      width: 400px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #shareable-link-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #shareable-link {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    #shareable-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Stream Video</h1>
+  
+  <!-- Video.js player -->
+  <video-js id="my-video" class="vjs-default-skin" controls preload="auto" width="640" height="360"
+    data-setup='{}'>
+    <source id="video-source" src="" type="">
+  </video-js>
+
+  <!-- Input field for video URL -->
+  <div class="input-container">
+    <input type="text" id="video-url" placeholder="Paste video URL here">
+    <button onclick="playVideo()">Play</button>
+  </div>
+
+  <!-- Shareable link -->
+  <div id="shareable-link-container">
+    <p>Shareable link: <a id="shareable-link" href="#" target="_blank">None</a></p>
+  </div>
+
+  <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
+  <script>
+    // Initialize the Video.js player
+    const player = videojs('my-video');
+
+    // Function to detect the video format and play it
+    function playVideo() {
+      const inputURL = document.getElementById('video-url').value;
+      
+      // Check if a valid URL was entered
+      if (!inputURL) {
+        alert('Please enter a valid video URL');
+        return;
+      }
+
+      // Determine video type based on file extension
+      let videoType = '';
+      if (inputURL.endsWith('.mp4')) {
+        videoType = 'video/mp4';
+      } else if (inputURL.endsWith('.webm')) {
+        videoType = 'video/webm';
+      } else if (inputURL.endsWith('.m3u8')) {
+        videoType = 'application/x-mpegURL';
+      } else {
+        alert('Unsupported video format!');
+        return;
+      }
+
+      // Set the video source dynamically
+      player.src({ src: inputURL, type: videoType });
+      player.play();
+
+      // Create the shareable URL
+      const shareableURL = `${window.location.origin}${window.location.pathname}?videoURL=${encodeURIComponent(inputURL)}`;
+      document.getElementById('shareable-link').href = shareableURL;
+      document.getElementById('shareable-link').textContent = shareableURL;
+    }
+
+    // Function to parse the URL and play video if a video URL is present in the query string
+    function autoPlayFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const videoURL = urlParams.get('videoURL');
+
+      if (videoURL) {
+        document.getElementById('video-url').value = videoURL;
+        playVideo(); // Automatically play the video
+      }
+    }
+
+    // Auto-play the video if the page is loaded with a video URL in the query string
+    window.onload = autoPlayFromURL;
+  </script>
+
+</body>
+</html>
