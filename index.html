@@ -130,22 +130,17 @@
       player.play();
 
       // Create the shareable URL
-      const directVideoLink = `${window.location.origin}${window.location.pathname}?directVideo=${encodeURIComponent(inputURL)}`;
-      document.getElementById('shareable-link').href = directVideoLink;
-      document.getElementById('shareable-link').textContent = directVideoLink;
+      const shareableURL = `${window.location.origin}${window.location.pathname}?videoURL=${encodeURIComponent(inputURL)}`;
+      document.getElementById('shareable-link').href = shareableURL;
+      document.getElementById('shareable-link').textContent = shareableURL;
     }
 
     // Function to parse the URL and play video if a video URL is present in the query string
     function autoPlayFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
       const videoURL = urlParams.get('videoURL');
-      const directVideoURL = urlParams.get('directVideo');
 
-      if (directVideoURL) {
-        // If directVideo param is present, redirect to play it directly (good for Rave)
-        window.location.href = directVideoURL;
-      } else if (videoURL) {
-        // Otherwise play the video normally
+      if (videoURL) {
         document.getElementById('video-url').value = videoURL;
         playVideo(); // Automatically play the video
       }
