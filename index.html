@@ -78,7 +78,7 @@
 </head>
 <body>
 
-  <h1>Stream Video</h1>
+  <h1 id="page-title">Stream Video</h1>
   
   <!-- Video.js player -->
   <video-js id="my-video" class="vjs-default-skin" controls preload="auto" width="640" height="360"
@@ -87,7 +87,7 @@
   </video-js>
 
   <!-- Input field for video URL -->
-  <div class="input-container">
+  <div class="input-container" id="input-container">
     <input type="text" id="video-url" placeholder="Paste video URL here">
     <button onclick="playVideo()">Play</button>
   </div>
@@ -104,7 +104,7 @@
 
     // Function to detect the video format and play it
     function playVideo() {
-      const inputURL = document.getElementById('video-url').value;
+      const inputURL = document.getElementById('video-url').value.trim();
       
       // Check if a valid URL was entered
       if (!inputURL) {
@@ -141,8 +141,29 @@
       const videoURL = urlParams.get('videoURL');
 
       if (videoURL) {
-        document.getElementById('video-url').value = videoURL;
-        playVideo(); // Automatically play the video
+        // Hide input fields and shareable link section for a cleaner player-only view
+        document.getElementById('input-container').style.display = 'none';
+        document.getElementById('shareable-link-container').style.display = 'none';
+        document.getElementById('page-title').style.display = 'none';
+
+        // Determine video type based on file extension
+        let videoType = '';
+        if (videoURL.endsWith('.mp4')) {
+          videoType = 'video/mp4';
+        } else if (videoURL.endsWith('.webm')) {
+          videoType = 'video/webm';
+        } else if (videoURL.endsWith('.m3u8')) {
+          videoType = 'application/x-mpegURL';
+        } else {
+          alert('Unsupported video format!');
+          return;
+        }
+
+        // Set the video source dynamically and play
+        player.src({ src: videoURL, type: videoType });
+        player.ready(() => {
+          player.play();
+        });
       }
     }
 
